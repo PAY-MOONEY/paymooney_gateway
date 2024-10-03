@@ -10,22 +10,26 @@ class PaymentDialogBuilder {
     String articleName,
     String articleDescription,
     String articleImage,
-    String amountToPay,
-    String fee,
+    String amount,
     String phoneNumber,
     String currency,
+    String publickKey,
+    String itemRef,
+    String lang,
     Function(Map<String, dynamic>) onPaymentResult,
   ) async {
     // Call the REST API before showing the modal
     final initializationResponse = await PaymentService.initializePayment(
-      articleName,
-      amountToPay,
-      fee,
-      phoneNumber,
-      currency,
-    );
+        articleName,
+        articleDescription,
+        amount,
+        publickKey,
+        phoneNumber,
+        currency,
+        articleImage,
+        itemRef);
 
-    if (initializationResponse['status'] == 'success') {
+    if (initializationResponse['response'] == 'success') {
       // Show the modal bottom sheet as the API call was successful
       await showModalBottomSheet<void>(
         context: context,
@@ -38,11 +42,19 @@ class PaymentDialogBuilder {
           return PaymentProcessWidget(
             articleName: articleName,
             articleDescription: articleDescription,
-            articleImage: articleImage,
-            amountToPay: amountToPay,
-            fee: fee,
-            phoneNumber: phoneNumber,
-            currency: currency,
+            articleImage: articleImage != null
+                ? articleImage
+                : 'https://via.placeholder.com/60',
+            amountToPay: initializationResponse['amount_to_paid'].toString(),
+            amount:
+                initializationResponse['payment_intent']['amount'].toString(),
+            fee: initializationResponse['fees'].toString(),
+            phoneNumber: initializationResponse['payment_intent']['phone'],
+            currency: initializationResponse['payment_intent']['currency_code'],
+            token: initializationResponse['payment_intent']['token'],
+            publicKey: publickKey,
+            itemRef: itemRef,
+            lang: lang,
             onPaymentResult: onPaymentResult,
           );
         },
@@ -63,9 +75,14 @@ class PaymentProcessWidget extends StatefulWidget {
   final String articleDescription;
   final String articleImage;
   final String amountToPay;
+  final String amount;
   final String fee;
   final String phoneNumber;
   final String currency;
+  final String publicKey;
+  final String itemRef;
+  final String token;
+  final String lang;
   final Function(Map<String, dynamic>) onPaymentResult;
 
   const PaymentProcessWidget({
@@ -74,9 +91,14 @@ class PaymentProcessWidget extends StatefulWidget {
     required this.articleDescription,
     required this.articleImage,
     required this.amountToPay,
+    required this.amount,
     required this.fee,
     required this.phoneNumber,
     required this.currency,
+    required this.publicKey,
+    required this.itemRef,
+    required this.token,
+    required this.lang,
     required this.onPaymentResult,
   }) : super(key: key);
 
@@ -96,12 +118,14 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
     });
 
     _paymentResult = await PaymentService.processPayment(
-      widget.articleName,
-      widget.amountToPay,
-      widget.fee,
-      widget.phoneNumber,
-      widget.currency,
-    );
+        widget.articleName,
+        widget.amountToPay,
+        widget.fee,
+        widget.phoneNumber,
+        widget.currency,
+        widget.token);
+
+    widget.onPaymentResult(_paymentResult!);
 
     setState(() {
       _isProcessing = false;
@@ -111,21 +135,22 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
   }
 
   Future<void> _verifyPaymentStatus() async {
-    if (_paymentResult != null && _paymentResult!['transaction_id'] != null) {
+    if (_paymentResult != null) {
       final statusResult = await PaymentService.checkPaymentStatus(
-          _paymentResult!['transaction_id']);
-      if (statusResult['status'] == 'success') {
+          widget.itemRef, widget.publicKey);
+      if (statusResult['status'] == 'Success') {
         setState(() {
           _paymentCompleted = true;
           _isSuccess = true;
-          _paymentResult =
-              statusResult; // Update payment result with the status
+          //_paymentResult = statusResult;
+          _paymentResult = {'status': 'success'};
+          // Update payment result with the status
         });
       } else {
         // Handle the case where the payment status is still pending or failed
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text(statusResult['message'] ??
+              content: Text(statusResult['error_message'] ??
                   'Unable to verify payment status.')),
         );
       }
@@ -218,8 +243,10 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Montant à Payer',
+                    Text(
+                      widget.lang == 'fr'
+                          ? 'Montant à Payer'
+                          : 'Amount to paid',
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.normal),
                     ),
@@ -229,13 +256,15 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Text(
-                      '${widget.amountToPay} ${widget.currency}',
+                      '${widget.amount} ${widget.currency}',
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 5),
                     Text(
-                      'Frais: ${widget.fee} ${widget.currency}',
+                      widget.lang == 'fr'
+                          ? 'Frais: ${widget.fee} ${widget.currency}'
+                          : 'Fees: ${widget.fee} ${widget.currency}',
                       style:
                           TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                     ),
@@ -247,25 +276,40 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
             SizedBox(height: 10),
             PaymentSummaryField(
                 label: 'Total',
-                value:
-                    '${(double.parse(widget.amountToPay) + double.parse(widget.fee)).toString()} ${widget.currency}',
+                value: '${widget.amountToPay} ${widget.currency}',
                 isTotal: true), // Including currency
             SizedBox(height: 10),
 
             PaymentSummaryField(
-                label: 'Numéro de Téléphone',
+                label: widget.lang == 'fr'
+                    ? 'Numéro de Téléphone'
+                    : 'Phone number',
                 value: '${widget.phoneNumber}',
                 isTotal: true), //
 
             SizedBox(height: 10),
 
             // Show payment processing message if processing is true
-            if (_isProcessing)
-              Text(
-                "Valid payment on your phone",
-                style: TextStyle(fontSize: 16, color: Colors.orange),
-                textAlign: TextAlign.center,
-              ),
+            if (_isProcessing) ...[
+              SizedBox(height: 10),
+              if (PaymentService.detectOperator(widget.phoneNumber) == 'orange')
+                Text(
+                  widget.lang == 'fr'
+                      ? "Vous allez recevoir un message pour valider le paiement ou composez #150*50#"
+                      : "You are going to receive message to valid payment or dial #150*50#",
+                  style: TextStyle(fontSize: 16, color: Colors.orange),
+                  textAlign: TextAlign.center,
+                ),
+              if (PaymentService.detectOperator(widget.phoneNumber) == 'mtn')
+                Text(
+                  widget.lang == 'fr'
+                      ? "Vous allez recevoir un message pour valider le paiement ou composez *126*14#"
+                      : "You are going to receive message to valid payment or dial *126*14#",
+                  style: TextStyle(fontSize: 16, color: Colors.orange),
+                  textAlign: TextAlign.center,
+                ),
+              SizedBox(height: 10),
+            ],
             ElevatedButton(
               onPressed: _isProcessing ? null : _processPayment,
               style: ElevatedButton.styleFrom(
@@ -278,7 +322,11 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
               ),
               child: _isProcessing
                   ? CircularProgressIndicator(color: Colors.white)
-                  : Text('Payer', style: TextStyle(fontSize: 18)),
+                  : Text(
+                      widget.lang == 'fr'
+                          ? 'Payer ${widget.amountToPay} ${widget.currency}'
+                          : 'Pay ${widget.amountToPay} ${widget.currency}',
+                      style: TextStyle(fontSize: 18, color: Colors.black87)),
             ),
             SizedBox(height: 0),
             Divider(height: 30, thickness: 1, color: Colors.grey[300]),
@@ -290,7 +338,7 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
                 Icon(Icons.lock, color: Colors.grey[600]), // Lock icon
                 SizedBox(width: 5), // Space between the icon and text
                 Text(
-                  'Secured by',
+                  widget.lang == 'fr' ? 'Sécurisé par' : 'Secured by',
                   style: TextStyle(
                     color: Colors.black, // Change color to blue
                     fontSize: 14,
@@ -307,26 +355,30 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
               ],
             ),
           ] else if (_isSuccess) ...[
+            //widget.onPaymentResult(_paymentResult!), // Call the callback function with the result
             // Success Page
             SuccessPage(
-              message: _paymentResult!['message'] ?? 'Payment Successful!',
-              transactionId: _paymentResult!['transaction_id'],
+              message: widget.lang == 'en'
+                  ? 'Payment Successful!'
+                  : 'Paiement Réussi !',
               onContinue: () {
                 Navigator.pop(context); // Close the dialog
-                widget.onPaymentResult(
-                    _paymentResult!); // Call the callback function with the result
               },
+              lang: widget.lang,
             )
           ] else ...[
+            //widget.onPaymentResult(_paymentResult!),
             // Error Page
             ErrorPage(
-              errorMessage: _paymentResult!['message'] ?? 'Payment failed.',
+              errorMessage:
+                  widget.lang == 'en' ? 'Payment failed.' : 'Paiement échoué',
               onRetry: () {
                 setState(() {
                   _paymentCompleted =
                       false; // Reset to show payment details again
                 });
               },
+              lang: widget.lang,
               onVerify:
                   _verifyPaymentStatus, // Link to check the payment status
             ),

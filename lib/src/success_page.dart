@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 
 class SuccessPage extends StatelessWidget {
   final String message;
-  final String transactionId;
+  final String lang;
   final VoidCallback onContinue;
 
   const SuccessPage({
     Key? key,
     required this.message,
-    required this.transactionId,
+    required this.lang,
     required this.onContinue,
   }) : super(key: key);
 
@@ -27,12 +27,6 @@ class SuccessPage extends StatelessWidget {
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 10),
-          Text(
-            'Transaction ID: $transactionId',
-            style: TextStyle(fontSize: 16, color: Colors.black54),
-            textAlign: TextAlign.center,
-          ),
           SizedBox(height: 30),
           ElevatedButton(
             onPressed: onContinue,
@@ -44,7 +38,8 @@ class SuccessPage extends StatelessWidget {
               ),
               minimumSize: Size(double.infinity, 50),
             ),
-            child: Text('Continue', style: TextStyle(fontSize: 18)),
+            child: Text(lang == 'en' ? 'Continue' : 'Continuer',
+                style: TextStyle(fontSize: 18, color: Colors.white)),
           ),
         ],
       ),

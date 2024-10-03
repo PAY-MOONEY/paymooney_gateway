@@ -4,12 +4,14 @@ class ErrorPage extends StatelessWidget {
   final String errorMessage;
   final VoidCallback? onRetry;
   final VoidCallback? onVerify;
+  final String lang;
 
   const ErrorPage({
     Key? key,
     required this.errorMessage,
     this.onRetry,
     this.onVerify,
+    required this.lang,
   }) : super(key: key);
 
   @override
@@ -39,14 +41,20 @@ class ErrorPage extends StatelessWidget {
                 ),
                 minimumSize: Size(double.infinity, 50),
               ),
-              child: Text('Try Again', style: TextStyle(fontSize: 18)),
+              child: Text(lang == 'en' ? 'Try Again' : 'Reéssayez',
+                  style: TextStyle(fontSize: 18, color: Colors.white)),
             ),
+          SizedBox(height: 10),
+          Text('-OR-', style: TextStyle(fontSize: 16, color: Colors.black)),
           SizedBox(height: 10),
           if (onVerify != null)
             TextButton(
               onPressed: onVerify,
-              child: Text('Verify Payment Status',
-                  style: TextStyle(color: Colors.blue)),
+              child: Text(
+                  lang == 'en'
+                      ? 'Verify Payment Status'
+                      : 'Verifiez le status du paiement',
+                  style: TextStyle(color: Colors.orange, fontSize: 16)),
             ),
         ],
       ),

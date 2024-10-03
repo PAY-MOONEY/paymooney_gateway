@@ -8,10 +8,12 @@ class PaymooneyGateway {
     required String articleName,
     required String articleDescription,
     required String articleImage,
-    required String amountToPay,
-    required String fee,
+    required String amount,
     required String phoneNumber,
     required String currency,
+    required String publickKey,
+    required String itemRef,
+    required String lang,
     required Function(Map<String, dynamic>) onPaymentResult,
   }) async {
     await PaymentDialogBuilder.show(
@@ -19,10 +21,12 @@ class PaymooneyGateway {
       articleName,
       articleDescription,
       articleImage,
-      amountToPay,
-      fee,
+      amount,
       phoneNumber,
       currency,
+      publickKey,
+      itemRef,
+      lang,
       onPaymentResult,
     );
   }
