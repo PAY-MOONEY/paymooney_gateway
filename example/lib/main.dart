@@ -74,23 +74,34 @@ class _MyHomePageState extends State<MyHomePage> {
       context,
       articleName: 'Sample Article',
       articleDescription: 'This is a description.',
-      articleImage: 'https://via.placeholder.com/60',
-      amountToPay: '100.00',
-      fee: '5.00',
-      phoneNumber: '1234567890',
-      currency: 'USD',
+      articleImage: 'https://via.placeholder.com/60', // or your app logo
+      amount: '100', // amount
+      phoneNumber: '670230798', // phone number without country code
+      currency: 'xaf', // currency
+      publickKey:
+          'PK_6KUj3tuKUrabAF4g0G2W', // your public key from paymooney dashboard
+      itemRef:
+          'code_test_15', // unique identifier for your payment on your side
+      lang: 'fr', // language take 2 values: fr ou en
       onPaymentResult: (Map<String, dynamic> paymentResult) {
+        print("status1: " + paymentResult['status']);
         if (paymentResult['status'] == 'success') {
-          print("status1: " + paymentResult['status']);
           // Handle successful payment result
+          //Write your logic
+          // Navigator.pop(context); // if you want to disable the default success dialog
+          print("Paiement successfuly !");
           ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(paymentResult['message'])));
-          String transactionId = paymentResult[
-              'transaction_id']; // Access transaction ID if needed
+              .showSnackBar(SnackBar(content: Text("Paiement successfuly !")));
         } else {
           // Handle payment error
-          ScaffoldMessenger.of(context)
-              .showSnackBar(SnackBar(content: Text(paymentResult['message'])));
+          print("error: Paiement has failed !");
+          // Navigator.pop(context); // if you want to disable the default failed dialog
+          // Note: Some time paiement return error due of internet connection or network from operator,
+          //to make sure you can call call paymentstatus (/api/v1.0/mp/paymentstatus)
+          //
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  "error: Paiement has failed:" + paymentResult['message'])));
         }
       },
     );
