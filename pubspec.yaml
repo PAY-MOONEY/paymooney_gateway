@@ -1,7 +1,8 @@
 name: paymooney_gateway
-description: A new Flutter package project.
+description: Flutter package for Paymooney Api integration.
 version: 0.0.1
-homepage:
+author: PAYMOONEY
+homepage: https://github.com/PAY-MOONEY/paymooney_gateway?tab=readme-ov-file
 
 environment:
   sdk: '>=3.0.2 <4.0.0'
