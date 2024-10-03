@@ -76,7 +76,7 @@ class _MyHomePageState extends State<MyHomePage> {
       articleDescription: 'This is a description.',
       articleImage: 'https://via.placeholder.com/60', // or your app logo
       amount: '100', // amount
-      phoneNumber: '670230798', // phone number without country code
+      phoneNumber: 'xxxxx', // phone number without country code
       currency: 'xaf', // currency
       publickKey:
           'PK_6KUj3tuKUrabAF4g0G2W', // your public key from paymooney dashboard
