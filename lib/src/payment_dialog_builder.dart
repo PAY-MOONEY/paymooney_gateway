@@ -42,7 +42,7 @@ class PaymentDialogBuilder {
           return PaymentProcessWidget(
             articleName: articleName,
             articleDescription: articleDescription,
-            articleImage: articleImage != null
+            articleImage: articleImage != ""
                 ? articleImage
                 : 'https://via.placeholder.com/60',
             amountToPay: initializationResponse['amount_to_paid'].toString(),

@@ -19,27 +19,27 @@ class SuccessPage extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Icon(Icons.check_circle, size: 80, color: Colors.green),
-          SizedBox(height: 20),
+          const Icon(Icons.check_circle, size: 80, color: Colors.green),
+          const SizedBox(height: 20),
           Text(
             message,
-            style: TextStyle(
+            style: const TextStyle(
                 fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 30),
+          const SizedBox(height: 30),
           ElevatedButton(
             onPressed: onContinue,
             style: ElevatedButton.styleFrom(
-              primary: Colors.green,
-              padding: EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              minimumSize: Size(double.infinity, 50),
+              minimumSize: const Size(double.infinity, 50),
             ),
             child: Text(lang == 'en' ? 'Continue' : 'Continuer',
-                style: TextStyle(fontSize: 18, color: Colors.white)),
+                style: const TextStyle(fontSize: 18, color: Colors.white)),
           ),
         ],
       ),
