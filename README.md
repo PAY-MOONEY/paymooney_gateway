@@ -36,7 +36,7 @@ dependencies:
  ```dart
 import 'package:paymooney_gateway/paymooney_gateway.dart';
 ```
-2. Call the `checkout` method and handle the respons
+2. Call the `init` method and handle the respons
 ```dart
 await PaymooneyGateway.init(
       context,
