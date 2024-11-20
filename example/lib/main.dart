@@ -76,12 +76,12 @@ class _MyHomePageState extends State<MyHomePage> {
       articleDescription: 'This is a description.',
       articleImage: 'https://via.placeholder.com/60', // or your app logo
       amount: '100', // amount
-      phoneNumber: 'xxxxx', // phone number without country code
+      phoneNumber: 'xxxxxxxxx', // phone number without country code
       currency: 'xaf', // currency
       publickKey:
           'PK_6KUj3tuKUrabAF4g0G2W', // your public key from paymooney dashboard
       itemRef:
-          'code_test_15', // unique identifier for your payment on your side
+          'code_test_155', // unique identifier for your payment on your side
       lang: 'fr', // language take 2 values: fr ou en
       onPaymentResult: (Map<String, dynamic> paymentResult) {
         print("status1: " + paymentResult['status']);

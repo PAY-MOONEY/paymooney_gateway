@@ -26,7 +26,7 @@ To use this package, add it to your project's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  paymooney_gateway: ^0.0.2
+  paymooney_gateway: ^0.0.3
 
 ```
 

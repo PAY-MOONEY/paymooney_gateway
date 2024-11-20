@@ -14,7 +14,26 @@ class PaymentSummaryField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      padding: EdgeInsets.only(left: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            child: Text(label,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.normal)),
+          ),
+          Container(
+            child: Text(value,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
+          )
+        ],
+      ),
+    );
+    /*return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -28,6 +47,6 @@ class PaymentSummaryField extends StatelessWidget {
                   fontWeight: isTotal ? FontWeight.bold : FontWeight.normal)),
         ],
       ),
-    );
+    );*/
   }
 }

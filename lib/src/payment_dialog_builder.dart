@@ -237,42 +237,19 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
             SizedBox(height: 20),
 
             // Price and Fee
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.lang == 'fr'
-                          ? 'Montant à Payer'
-                          : 'Amount to paid',
-                      style: TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.normal),
-                    ),
-                  ],
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      '${widget.amount} ${widget.currency}',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(height: 5),
-                    Text(
-                      widget.lang == 'fr'
-                          ? 'Frais: ${widget.fee} ${widget.currency}'
-                          : 'Fees: ${widget.fee} ${widget.currency}',
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                // Including currency
-              ],
-            ),
+            PaymentSummaryField(
+                label:
+                    widget.lang == 'fr' ? 'Montant à Payer' : 'Amount to paid',
+                value: '${widget.amount} ${widget.currency}',
+                isTotal: true),
+
+            SizedBox(height: 10),
+            PaymentSummaryField(
+                label: widget.lang == 'fr'
+                    ? 'Frais de transaction'
+                    : 'Transaction fees',
+                value: '${widget.fee} ${widget.currency}',
+                isTotal: true),
             SizedBox(height: 10),
             PaymentSummaryField(
                 label: 'Total',
@@ -313,7 +290,7 @@ class _PaymentProcessWidgetState extends State<PaymentProcessWidget> {
             ElevatedButton(
               onPressed: _isProcessing ? null : _processPayment,
               style: ElevatedButton.styleFrom(
-                primary: Colors.orange,
+                backgroundColor: Colors.orange,
                 padding: EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
